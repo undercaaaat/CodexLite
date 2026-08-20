@@ -1,0 +1,68 @@
+name: Build macOS bundles
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: macOS ${{ matrix.architecture }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: arm64
+            runner: macos-15
+            asset_name: CodexLite-0.5.0-codex-0.144.6-macos-arm64
+          - architecture: x86_64
+            runner: macos-15-intel
+            asset_name: CodexLite-0.5.0-codex-0.144.6-macos-x86_64
+
+    steps:
+      - name: Check out CodexLite
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Build and verify patched Codex
+        run: bash experiments/codex-no-tools/build-macos.sh
+
+      - name: Test Python runner
+        run: |
+          python3 -m pip install -e .
+          python3 -m unittest discover -s tests -v
+
+      - name: Build Python wheel
+        run: |
+          mkdir -p .build/wheels
+          python3 -m pip wheel . --no-deps --wheel-dir .build/wheels
+
+      - name: Package bundle
+        env:
+          ASSET_NAME: ${{ matrix.asset_name }}
+        run: |
+          set -euo pipefail
+          bundle=".build/${ASSET_NAME}"
+          mkdir -p "${bundle}/bin" "${bundle}/licenses" "${bundle}/packages"
+          cp .tools/codex-no-tools-macos/codex-exec "${bundle}/bin/codex-exec"
+          cp .tools/codex-no-tools-macos/build-info.json "${bundle}/build-info.json"
+          cp .build/wheels/*.whl "${bundle}/packages/"
+          cp README-QUICKSTART-MACOS.md "${bundle}/README-QUICKSTART.md"
+          cp MODIFICATIONS.md "${bundle}/MODIFICATIONS.md"
+          cp LICENSE "${bundle}/LICENSE-CODEXLITE.txt"
+          cp .tools/codex-no-tools-macos/source/LICENSE \
+              "${bundle}/licenses/LICENSE-CODEX-APACHE-2.0.txt"
+          cp .tools/codex-no-tools-macos/source/NOTICE \
+              "${bundle}/licenses/NOTICE-CODEX.txt"
+          cp experiments/codex-no-tools/codex-rust-v0.144.6-no-tools.patch \
+              "${bundle}/codex-rust-v0.144.6-no-tools.patch"
+          tar -C .build -czf ".build/${ASSET_NAME}.tar.gz" "${ASSET_NAME}"
+
+      - name: Upload bundle
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: ${{ matrix.asset_name }}
+          path: .build/${{ matrix.asset_name }}.tar.gz
+          if-no-files-found: error

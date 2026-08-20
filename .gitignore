@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+build/
+dist/
+.build/
+.DS_Store
+
+# Runtime data can contain large question sets and generated answers.
+*.db
+*.db-shm
+*.db-wal
+*.db.manifest.json
+*.lock
+*.report.json
+answers.jsonl
+
+# Local Codex inspection data.
+.codex-debug/
+.smoke*/
+.test-run/
+.tools/
+
+# Generated experiment measurements.
+experiments/codex-no-tools/latest-measurement.json
