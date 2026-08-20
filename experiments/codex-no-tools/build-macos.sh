@@ -79,8 +79,8 @@ fi
 sed -i.bak '/^    "realtime-webrtc",$/d' Cargo.toml
 rm Cargo.toml.bak
 
-cargo test --locked -p codex-features
-cargo build --locked --release -p codex-exec --bin codex-exec
+cargo test -p codex-features
+cargo build --release -p codex-exec --bin codex-exec
 cargo_version="$(cargo --version)"
 rustc_version="$(rustc --version)"
 popd >/dev/null
