@@ -69,8 +69,18 @@ git diff --check
 
 pushd codex-rs >/dev/null
 export CARGO_TARGET_DIR="${source_path}/codex-rs/target"
-cargo test -p codex-features
-cargo build --release -p codex-exec --bin codex-exec
+export CARGO_NET_GIT_FETCH_WITH_CLI=true
+
+# codex-exec does not use the realtime workspace member or its large WebRTC checkout.
+if ! grep -Fqx '    "realtime-webrtc",' Cargo.toml; then
+    echo "expected realtime-webrtc workspace member was not found" >&2
+    exit 1
+fi
+sed -i.bak '/^    "realtime-webrtc",$/d' Cargo.toml
+rm Cargo.toml.bak
+
+cargo test --locked -p codex-features
+cargo build --locked --release -p codex-exec --bin codex-exec
 cargo_version="$(cargo --version)"
 rustc_version="$(rustc --version)"
 popd >/dev/null
