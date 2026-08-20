@@ -11,10 +11,12 @@
 ## 下载
 
 普通使用者可以从 [GitHub Releases](https://github.com/undercaaaat/CodexLite/releases)
-下载对应平台的便携包，不需要安装 Rust 或 Visual Studio：
+下载 Windows x64 便携包，不需要安装 Rust 或 Visual Studio：
 
 - Windows x64：阅读 [Windows Quick Start](README-QUICKSTART.md)。
-- macOS Apple Silicon/Intel：阅读 [macOS Quick Start](README-QUICKSTART-MACOS.md)。
+
+当前 Release 只提供 Windows x64 安装包。macOS 用户仍可按照
+[macOS Quick Start](README-QUICKSTART-MACOS.md) 从源码构建。
 
 每位使用者仍需安装官方 Codex CLI，并使用自己的账户登录。Release 不包含登录信息、
 API Key、题库或生成答案。
