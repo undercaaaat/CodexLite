@@ -38,11 +38,18 @@ Apple Silicon 或 Intel，并生成对应架构的原生执行器：
 bash experiments/codex-no-tools/build-macos.sh
 ```
 
+Linux 需要 Git、Python 3、Rust、C/C++ 构建工具、`pkg-config`、OpenSSL 开发包和
+`libcap` 开发包。脚本支持 x86_64 和 aarch64，并在当前机器上原生构建：
+
+```bash
+bash experiments/codex-no-tools/build-linux.sh
+```
+
 构建脚本会：
 
 1. 检出并核对固定的 Codex 源码提交。
 2. 应用补丁并运行 `codex-features` 测试。
-3. 只构建非交互的 `codex-exec.exe`。
+3. 只构建非交互的 `codex-exec`（Windows 上为 `codex-exec.exe`）。
 4. 使用本地无鉴权端点检查最终请求体。
 
 验证器要求请求中没有工具、没有 `AdditionalTools`、没有非消息上下文，并且只包含指定的
@@ -53,6 +60,8 @@ bash experiments/codex-no-tools/build-macos.sh
 ```text
 .tools\codex-no-tools\codex-exec.exe
 .tools\codex-no-tools\build-info.json
+.tools/codex-no-tools-linux/codex-exec
+.tools/codex-no-tools-linux/build-info.json
 .tools/codex-no-tools-macos/codex-exec
 .tools/codex-no-tools-macos/build-info.json
 ```

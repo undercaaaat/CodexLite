@@ -23,7 +23,7 @@ Python wheel:
 ```powershell
 python -m venv .venv
 & .\.venv\Scripts\Activate.ps1
-python -m pip install ".\packages\codex_batch-0.5.0-py3-none-any.whl"
+python -m pip install ".\packages\codex_batch-0.5.1-py3-none-any.whl"
 ```
 
 Then check the installation and sign in with your own account:

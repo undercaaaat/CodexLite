@@ -103,6 +103,7 @@ def main() -> None:
                 cwd=workspace,
                 env=environment,
                 capture_output=True,
+                stdin=subprocess.DEVNULL,
                 timeout=60,
             )
         if not server.request_received.wait(timeout=5):

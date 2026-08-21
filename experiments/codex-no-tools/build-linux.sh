@@ -7,41 +7,36 @@ commit="5d1fbf26c43abc65a203928b2e31561cb039e06d"
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd -- "${script_dir}/../.." && pwd)"
 patch_path="${script_dir}/codex-rust-v0.144.6-no-tools.patch"
-destination="${project_root}/.tools/codex-no-tools-macos"
+destination="${project_root}/.tools/codex-no-tools-linux"
 source_path="${destination}/source"
 binary_path="${destination}/codex-exec"
 
-if [[ "$(uname -s)" != "Darwin" ]]; then
-    echo "build-macos.sh must run on macOS" >&2
+if [[ "$(uname -s)" != "Linux" ]]; then
+    echo "build-linux.sh must run on Linux" >&2
     exit 1
 fi
 
 case "$(uname -m)" in
-    arm64)
-        architecture="arm64"
-        rust_target="aarch64-apple-darwin"
-        ;;
     x86_64)
         architecture="x86_64"
-        rust_target="x86_64-apple-darwin"
+        rust_target="x86_64-unknown-linux-gnu"
+        ;;
+    aarch64)
+        architecture="aarch64"
+        rust_target="aarch64-unknown-linux-gnu"
         ;;
     *)
-        echo "unsupported macOS architecture: $(uname -m)" >&2
+        echo "unsupported Linux architecture: $(uname -m)" >&2
         exit 1
         ;;
 esac
 
-for command_name in git cargo rustc python3 xcode-select; do
+for command_name in git cargo rustc python3 strip; do
     if ! command -v "${command_name}" >/dev/null 2>&1; then
         echo "${command_name} is required" >&2
         exit 1
     fi
 done
-
-if ! xcode-select -p >/dev/null 2>&1; then
-    echo "install the Xcode Command Line Tools first" >&2
-    exit 1
-fi
 
 mkdir -p "${destination}"
 if [[ ! -d "${source_path}/.git" ]]; then
@@ -87,6 +82,7 @@ rustc_version="$(rustc --version)"
 popd >/dev/null
 
 cp "${source_path}/codex-rs/target/release/codex-exec" "${binary_path}"
+strip --strip-unneeded "${binary_path}"
 chmod 755 "${binary_path}"
 
 {
@@ -96,7 +92,7 @@ chmod 755 "${binary_path}"
     printf '  "codex_commit": "%s",\n' "${commit}"
     printf '  "codex_tag": "%s",\n' "${tag}"
     printf '  "mode": "answer_only",\n'
-    printf '  "platform": "macos",\n'
+    printf '  "platform": "linux",\n'
     printf '  "rust_target": "%s",\n' "${rust_target}"
     printf '  "rustc": "%s"\n' "${rustc_version}"
     printf '}\n'
@@ -109,4 +105,4 @@ python3 "${script_dir}/verify_request.py" \
     --model "gpt-5.6-sol"
 
 "${binary_path}" --version
-printf 'Built patched macOS Codex exec: %s\n' "${binary_path}"
+printf 'Built patched Linux Codex exec: %s\n' "${binary_path}"
