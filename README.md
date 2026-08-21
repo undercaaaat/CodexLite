@@ -2,7 +2,7 @@
 
 这是一个基于官方 `codex exec` 接口的批量问答器，适合把数千道相互独立的小题分批交给 Codex。它使用 SQLite 保存进度，支持并发、超时、重试、失败后逐题降级，以及中断后的断点续跑。
 
-当前版本是 `0.5.0`。核心执行、恢复、审计和导出流程只使用 Python 标准库。
+当前版本是 `0.5.1`。核心执行、恢复、审计和导出流程只使用 Python 标准库。
 
 项目不会提取或重放 Codex 登录凭据，也不会调用未公开的内部接口。每轮使用临时会话、
 空工作目录和只读沙箱。补丁版 Codex 在最终请求边界只保留当前用户消息，并清空模型
@@ -11,11 +11,12 @@
 ## 下载
 
 普通使用者可以从 [GitHub Releases](https://github.com/undercaaaat/CodexLite/releases)
-下载 Windows x64 便携包，不需要安装 Rust 或 Visual Studio：
+下载预编译便携包，不需要安装 Rust、Visual Studio 或 Linux 编译工具：
 
 - Windows x64：阅读 [Windows Quick Start](README-QUICKSTART.md)。
+- Ubuntu 22.04+ x86_64：阅读 [Linux Quick Start](README-QUICKSTART-LINUX.md)。
 
-当前 Release 只提供 Windows x64 安装包。macOS 用户仍可按照
+macOS 用户仍可按照
 [macOS Quick Start](README-QUICKSTART-MACOS.md) 从源码构建。
 
 每位使用者仍需安装官方 Codex CLI，并使用自己的账户登录。Release 不包含登录信息、
@@ -25,7 +26,8 @@ API Key、题库或生成答案。
 
 需要 Python 3.11+、已安装的 Codex CLI、可正常使用的 Codex 登录状态，以及本项目构建的
 补丁版 `codex-exec`。正式问答不接受原版 Codex 包装器。Python 批处理器支持 Windows、
-macOS 和 Linux；当前补丁构建脚本覆盖 Windows x64 以及 macOS Apple Silicon/Intel。
+macOS 和 Linux；补丁构建脚本覆盖 Windows x64、Linux x86_64/aarch64 以及 macOS
+Apple Silicon/Intel。
 
 ```powershell
 codex --version
@@ -44,6 +46,15 @@ bash experiments/codex-no-tools/build-macos.sh
 
 macOS 构建产物位于 `.tools/codex-no-tools-macos/codex-exec`。也可以在 GitHub
 Actions 中手动运行 `Build macOS bundles`，分别生成 Apple Silicon 和 Intel 安装包。
+
+Linux 在仓库根目录执行：
+
+```bash
+python3 -m pip install -e .
+bash experiments/codex-no-tools/build-linux.sh
+```
+
+Linux 构建产物位于 `.tools/codex-no-tools-linux/codex-exec`。
 
 安装不引入第三方 Python 依赖。
 

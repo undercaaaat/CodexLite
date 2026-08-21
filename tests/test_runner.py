@@ -17,7 +17,7 @@ from codex_batch.storage import Question
 class CodexRunnerTests(unittest.TestCase):
     def make_runner(
         self,
-        executable: str = r"C:\tools\codex-exec.exe",
+        executable: str = "codex-exec",
     ) -> CodexRunner:
         settings = CodexSettings(
             command="answer-only-codex",
@@ -46,7 +46,7 @@ class CodexRunnerTests(unittest.TestCase):
 
         command = runner._build_command(Path("result.json"))
 
-        self.assertEqual(command[0], r"C:\tools\codex-exec.exe")
+        self.assertEqual(command[0], "codex-exec")
         self.assertEqual(command[-1], "-")
         self.assertIn("features.answer_only=true", command)
         self.assertNotIn("features.no_tools=true", command)

@@ -7,7 +7,7 @@ $sourceBuildInfo = Join-Path $sourceRoot "build-info.json"
 $sourceLicense = Join-Path $sourceRoot "source\LICENSE"
 $sourceNotice = Join-Path $sourceRoot "source\NOTICE"
 $buildRoot = Join-Path $projectRoot ".build"
-$assetName = "CodexLite-0.5.0-codex-0.144.6-windows-x64"
+$assetName = "CodexLite-0.5.1-codex-0.144.6-windows-x64"
 $bundleRoot = Join-Path $buildRoot $assetName
 $archivePath = Join-Path $buildRoot ($assetName + ".zip")
 $wheelDirectory = Join-Path $buildRoot "wheels-windows"
@@ -46,7 +46,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "failed to build the CodexLite Python wheel"
 }
 
-$wheelPath = Join-Path $wheelDirectory "codex_batch-0.5.0-py3-none-any.whl"
+$wheelPath = Join-Path $wheelDirectory "codex_batch-0.5.1-py3-none-any.whl"
 if (-not (Test-Path -LiteralPath $wheelPath)) {
     throw "expected wheel was not produced: $wheelPath"
 }
@@ -55,7 +55,7 @@ Copy-Item -LiteralPath $sourceBinary -Destination (
     Join-Path $bundleRoot "bin\codex-exec.exe"
 )
 Copy-Item -LiteralPath $wheelPath -Destination (
-    Join-Path $bundleRoot "packages\codex_batch-0.5.0-py3-none-any.whl"
+    Join-Path $bundleRoot "packages\codex_batch-0.5.1-py3-none-any.whl"
 )
 Copy-Item -LiteralPath (Join-Path $projectRoot "README-QUICKSTART.md") `
     -Destination (Join-Path $bundleRoot "README-QUICKSTART.md")

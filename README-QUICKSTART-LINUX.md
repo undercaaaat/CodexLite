@@ -1,4 +1,4 @@
-# CodexLite Quick Start for macOS
+# CodexLite Quick Start for Linux
 
 CodexLite runs independent questions through a patched Codex CLI with no
 model-visible tool schema or host context. The workflow is:
@@ -9,32 +9,32 @@ model-visible tool schema or host context. The workflow is:
 
 ## Requirements
 
-- macOS on Apple Silicon or Intel
+- Ubuntu 22.04 or newer on x86_64
 - Python 3.11 or newer
-- The Codex CLI, signed in with your own account
-- A CodexLite bundle matching the Mac architecture
+- The official Codex CLI, signed in with your own account
+- The CodexLite Linux x86_64 bundle
 
-Check the machine architecture before downloading a bundle:
+Check the operating system and architecture:
 
 ```bash
 uname -m
+cat /etc/os-release
+python3.11 --version
 ```
 
-Use the `arm64` bundle when the result is `arm64`. Use the `x86_64` bundle when
-the result is `x86_64`.
+The release bundle requires `x86_64`. Use the source build described below for
+other Linux architectures. If Python has a different executable name on your
+distribution, use that 3.11-or-newer executable in place of `python3.11` below.
 
 ## Install the bundle
 
-Extract the archive, enter its directory, and install the Python package in a
-virtual environment:
-
 ```bash
-tar -xzf CodexLite-0.5.1-codex-0.144.6-macos-arm64.tar.gz
-cd CodexLite-0.5.1-codex-0.144.6-macos-arm64
+tar -xzf CodexLite-0.5.1-codex-0.144.6-linux-x86_64-ubuntu22.04.tar.gz
+cd CodexLite-0.5.1-codex-0.144.6-linux-x86_64-ubuntu22.04
 
-python3 -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
-python3 -m pip install packages/codex_batch-0.5.1-py3-none-any.whl
+python -m pip install packages/codex_batch-0.5.1-py3-none-any.whl
 
 chmod +x bin/codex-exec
 codex-batch --version
@@ -44,10 +44,6 @@ codex login status
 
 Run `codex login` if the account is not signed in. CodexLite does not include
 or copy login credentials.
-
-Early research builds may be unsigned. If macOS blocks the executable, review
-the downloaded source and release first, then approve the binary in **System
-Settings > Privacy & Security**. Do not disable Gatekeeper globally.
 
 ## 1. Inspect the question bank
 
@@ -64,7 +60,7 @@ printing complete private questions:
 ```bash
 source_path="/path/to/source-questions.jsonl"
 
-python3 - "${source_path}" <<'PY'
+python3.11 - "${source_path}" <<'PY'
 import json
 import sys
 
@@ -84,10 +80,10 @@ with open(source_path, "r", encoding="utf-8") as input_file:
 PY
 ```
 
-Identify the stable question ID field and the complete question-text field. If
-the source already uses `id` and `question`, no field conversion is needed.
-CSV, Excel, SQLite, and other formats must first be exported or converted to
-the same JSONL contract.
+Identify the stable question ID field and complete question-text field. If the
+source already uses `id` and `question`, no conversion is needed. CSV, Excel,
+SQLite, and other formats must first be exported or converted to the same JSONL
+contract.
 
 ## 2. Extract a 10-question pilot
 
@@ -102,7 +98,7 @@ input_path="${work_dir}/questions.jsonl"
 
 mkdir -p "${work_dir}"
 
-python3 - "${source_path}" "${input_path}" <<'PY'
+python3.11 - "${source_path}" "${input_path}" <<'PY'
 import json
 import os
 import sys
@@ -141,8 +137,8 @@ for question in questions:
 PY
 ```
 
-The final output should list 10 unique IDs with non-zero question lengths.
-Remove the `len(questions) == 10` limit only after reviewing the pilot results.
+The output should list 10 unique IDs with non-zero question lengths. Remove the
+10-question limit only after reviewing the pilot results.
 
 ## 3. Validate without calling Codex
 
@@ -156,8 +152,7 @@ codex-batch run "${input_path}" \
     --dry-run
 ```
 
-Confirm that `Total` is `10`, `Unfinished` is `10`, and the command reports
-that Codex was not called.
+Confirm that `Total` is `10`, `Unfinished` is `10`, and Codex was not called.
 
 ## 4. Start answering
 
@@ -190,10 +185,23 @@ codex-batch status --db "${db_path}"
 ```
 
 Answers are exported to `answers.jsonl`; checkpoints and attempt history remain
-in `answers.db`. If the process stops, activate the same virtual environment
-and execute the same live command again. Do not delete the database. Use a new
+in `answers.db`. If the process stops, activate the same virtual environment and
+execute the same live command again. Do not delete the database. Use a new
 working directory when the input, model, reasoning effort, batch size, or
 fallback setting changes.
+
+## Build from source
+
+Install Git, Python 3, Rust, `pkg-config`, a C compiler, and the libcap headers.
+From the CodexLite repository root, run:
+
+```bash
+bash experiments/codex-no-tools/build-linux.sh
+python3.11 -m pip install -e .
+```
+
+The patched executable is written to
+`.tools/codex-no-tools-linux/codex-exec`.
 
 ## Appendix: Start answering parameters
 
